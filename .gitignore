@@ -20,3 +20,10 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
+
+# upload scripts
+upload.sh
+upload.log
+
+haskemlia.cabal
+
