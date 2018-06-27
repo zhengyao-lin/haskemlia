@@ -1,7 +1,6 @@
 module Network.Kademlia.KBucket where
 
 import Data.List
-import qualified Data.ByteString as BSR
 
 import Network.Kademlia.Util
 import Network.Kademlia.Types
@@ -10,6 +9,7 @@ type Bucket = [Node]
 data NodeSet =
     NodeSet {
         set_self :: Node,
+        set_k    :: Int,
         set_buck :: [Bucket]
     }
 
@@ -17,6 +17,7 @@ initSet :: NetworkParam -> Node -> NodeSet
 initSet param self =
     NodeSet {
         set_self = self,
+        set_k = net_k param,
         set_buck = replicate (netLength param) []
     }
 
@@ -37,7 +38,11 @@ addNode node set =
     if node == set_self set then set
     else
         -- remove the node first(if it exists) then add it to the top
-        updateBucket idx ((node:) . delete node) set
+        -- if the bucket is full, remove the last one
+        updateBucket idx (\buck ->
+            let new = node : delete node buck in
+            if length new > set_k set then init new
+            else new) set
 
     where idx = toBucketID set (node_id node)
 

@@ -1,9 +1,12 @@
 module Network.Kademlia.Types where
 
 import Data.Bits
+import Data.Hashable
 import qualified Data.ByteString as BSR
 
-type Hash = BSR.ByteString
+type Value = BSR.ByteString
+
+type Hash = BSR.ByteString -- already an instance of Ord
 type KeyID = Hash
 
 distance :: KeyID -> KeyID -> KeyID
@@ -37,14 +40,21 @@ data Node =
         node_id :: KeyID
     }
 
+instance Hashable Node where
+    hashWithSalt salt node =
+        hashWithSalt salt (node_id node)
+
 instance Eq Node where
     n1 == n2 = node_id n1 == node_id n2
 
 data NetworkParam =
     NetworkParam {
-        net_k     :: Int,
-        net_alpha :: Int,
-        net_hash  :: HashFunction
+        net_k         :: Int,
+        net_alpha     :: Int,
+        net_max_store :: Int,
+        net_timeout   :: Int, -- in sec
+        net_max_recv  :: Int,
+        net_hash      :: HashFunction
     }
 
 netLength = hashLength . net_hash

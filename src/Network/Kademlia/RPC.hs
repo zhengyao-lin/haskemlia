@@ -2,7 +2,6 @@
 
 module Network.Kademlia.RPC where
 
-import Data.ByteString
 import qualified Data.ByteString as BSR
 
 import Control.Monad
@@ -11,21 +10,32 @@ import Control.Monad.Conc.Class
 import Network.Kademlia.Types
 
 data Method
+    -- request
     = Ping
-    | Pong
     | FindValue KeyID
     | FindNode KeyID
-    | Value ByteString
+    | Store KeyID Value
+
+    -- response
+    | Pong
+    | Value Value
     | Nodes [Node]
+    | Stored Bool
+
+    | Error String
+
+isRequest Ping = True
+isRequest (FindValue _) = True
+isRequest (FindNode _) = True
+isRequest (Store _ _) = True
+isRequest _ = False
 
 data Message =
     Message {
         sender :: Node,
-        method :: Method,
-        msg_id :: ByteString
+        method :: Method
     }
 
 class MonadConc m => Network m n where
-    call :: n -> Message -> m Message
-    response :: n -> Message -> m ()
-    receive :: n -> m Message
+    call :: n -> Node -> Message -> m (Maybe Message)
+    receive :: n -> m (Message, Message -> m ())

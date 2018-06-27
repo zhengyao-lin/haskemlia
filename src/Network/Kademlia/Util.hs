@@ -1,5 +1,8 @@
 module Network.Kademlia.Util where
 
+class Default a where
+    def :: a
+
 replace :: Int -> a -> [a] -> [a]
 replace i e l =
     take i l ++ e : drop (i + 1) l

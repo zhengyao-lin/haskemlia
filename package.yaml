@@ -25,6 +25,11 @@ dependencies:
 - concurrency
 - mtl
 - transformers
+- unordered-containers
+- network
+- hashtables
+- hashable
+- random
 
 library:
   source-dirs: src
